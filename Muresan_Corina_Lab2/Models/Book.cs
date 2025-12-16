@@ -22,5 +22,7 @@ namespace Muresan_Corina_Lab2.Models
 
         public int? AuthorID { get; set; }
         public Author? Author { get; set; } //navigation property
+
+        public ICollection<BookCategory>? BookCategories { get; set; }
     }
 }
