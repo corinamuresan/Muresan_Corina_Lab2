@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Muresan_Corina_Lab2.Data;
 using Muresan_Corina_Lab2.Models;
+using Muresan_Corina_Lab2.Models.ViewModels;
 
 namespace Muresan_Corina_Lab2.Pages.Publishers
 {
@@ -19,11 +14,30 @@ namespace Muresan_Corina_Lab2.Pages.Publishers
             _context = context;
         }
 
-        public IList<Publisher> Publisher { get;set; } = default!;
+        public PublisherIndexData PublisherData { get; set; } = new PublisherIndexData();
+ 
+        public int PublisherID { get; set; }
+        public int BookID { get; set; }
 
-        public async Task OnGetAsync()
+        public async Task OnGetAsync(int? id, int? bookID)
         {
-            Publisher = await _context.Publisher.ToListAsync();
+
+            PublisherData.Publishers = await _context.Publisher
+                .Include(p => p.Books)
+                    .ThenInclude(b => b.Author)
+                .OrderBy(p => p.PublisherName)
+                .ToListAsync();
+
+            if (id != null)
+            {
+                PublisherID = id.Value;
+                Publisher publisher = PublisherData.Publishers
+                    .Single(p => p.ID == id.Value);
+
+                PublisherData.Books = publisher.Books;
+            }
         }
     }
 }
+
+
